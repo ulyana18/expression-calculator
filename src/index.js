@@ -17,10 +17,10 @@ function expressionCalculator(expr) {
             (number !== '')? out.push(+number) : 0;
             number = '';
             let priority = getPriority(symbol);
-            if(stack[0] !== undefined && symbol !== '(' && priority <= getPriority(stack[stack.length-1])) {
+            while(stack[0] !== undefined && symbol !== '(' && priority <= getPriority(stack[stack.length-1])) {
                 out.push(stack.pop());
             }
-            checkZero(symbol, expr);
+            checkZero(symbol);
             stack.push(symbol);
         } else {
             if(symbol === ')') {
@@ -42,18 +42,20 @@ function expressionCalculator(expr) {
     let result = [];
     for(symbol of out) {
         if(symbol === '+' || symbol === '-' || symbol === '*' || symbol === '/') {
+            let first = result.pop();
+            let second = result.pop();
             switch(symbol) {
                 case '+': 
-                    result.push(result.pop()+result.pop());
+                    result.push(second+first);
                     break;
                 case '-': 
-                    result.push(-result.pop()+result.pop());
+                    result.push(second-first);
                     break;
                 case '*': 
-                    result.push(result.pop()*result.pop());
+                    result.push(second*first);
                     break;
                 case '/': 
-                    result.push(1/result.pop()*result.pop());
+                    result.push(second/first);
                     break;
             }
         }
@@ -62,7 +64,7 @@ function expressionCalculator(expr) {
         }
     }
 
-    return result = result[0];
+    return result.pop();
 
     function checkBrackets (expr) {
         let open = 0;
@@ -76,7 +78,7 @@ function expressionCalculator(expr) {
         }
     }
 
-    function checkZero (symbol, out) {
+    function checkZero (symbol) {
         if(symbol === '/' &&  expr[i] === '0') {
             throw new Error('TypeError: Division by zero.');
         }
